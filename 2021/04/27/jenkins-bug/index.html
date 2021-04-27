@@ -1,0 +1,204 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN" class="loading">
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>记一次jenkins相关被挖矿处理的应对 - wumi&#39;s blog</title>
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="google" content="notranslate" />
+    <meta name="keywords" content="wumi,"> 
+    <meta name="description" content="wumi&#39;s blog,前置事件的起源其实是上次更新blog后的疑问
+
+时隔多年再次更新下blog, 更新下主题, 想着记录点儿什么~
+
+虽说想法是好的, 但作为一个资深沉默的观察员的我, 自然是 当我沉默着的时候,我觉得,"> 
+    <meta name="author" content="5mi"> 
+    <link rel="alternative" href="atom.xml" title="wumi&#39;s blog" type="application/atom+xml"> 
+    <link rel="icon" href="/img/favicon.png"> 
+    
+    
+<link rel="stylesheet" href="/css/diaspora.css">
+
+    <link rel="stylesheet" href="//at.alicdn.com/t/font_2511899_nhreworgr7.css">
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+<body class="loading">
+    <span id="config-title" style="display:none">wumi&#39;s blog</span>
+    <div id="loader"></div>
+    <div id="single">
+    <div id="top" style="display: block;">
+    <div class="bar" style="width: 0;"></div>
+    <a class="iconfont icon-home image-icon" href="javascript:;" data-url="/"></a>
+    <div title="播放/暂停" class="iconfont icon-play"></div>
+    <h3 class="subtitle">记一次jenkins相关被挖矿处理的应对</h3>
+    <div class="social">
+        <div>
+            <div class="share">
+                <a title="获取二维码" class="iconfont icon-scan" href="javascript:;"></a>
+            </div>
+            <div id="qr"></div>
+        </div>
+    </div>
+    <div class="scrollbar"></div>
+</div>
+
+    <div class="section">
+        <div class="article">
+    <div class='main'>
+        <h1 class="title">记一次jenkins相关被挖矿处理的应对</h1>
+        <div class="stuff">
+            <span>四月 27, 2021</span>
+            
+                <!-- 不蒜子统计 -->
+                <span id="busuanzi_container_page_pv" style='display:none'>
+                      <i class="iconfont-for-blog icon-for-blogbook"></i> <span id="busuanzi_value_page_pv"></span>
+                </span>
+            
+            
+  <ul class="post-tags-list" itemprop="keywords"><li class="post-tags-list-item"><a class="post-tags-list-link" href="/tags/jenkins/" rel="tag">jenkins</a></li><li class="post-tags-list-item"><a class="post-tags-list-link" href="/tags/linux/" rel="tag">linux</a></li><li class="post-tags-list-item"><a class="post-tags-list-link" href="/tags/ssh/" rel="tag">ssh</a></li></ul>
+
+
+        </div>
+        <div class="content markdown">
+            <h3 id="前置"><a href="#前置" class="headerlink" title="前置"></a>前置</h3><p>事件的起源其实是上次更新blog后的疑问</p>
+<blockquote>
+<p>时隔多年再次更新下blog, 更新下主题, 想着记录点儿什么~</p>
+</blockquote>
+<p>虽说想法是好的, 但作为一个资深<code>沉默的观察员</code>的我, 自然是 <code>当我沉默着的时候,我觉得充实,我将开口,同时感到空虚</code>, 所以平时看看还好, 真要张嘴马上无话可说了, 平时没事儿就思考人生,想起自己毕业时写的一个静态页面, 那是一个介绍我当时玩的游戏的小页面, 想着正好服务器,域名都空着没用, 不妨把这个当时照着视频教程开发的小页面放上去试试, 也算纪念下回归初心</p>
+<p>说干就干, 本地ssh登录服务器时却登不上, 之前可能卡了点还总断,但好歹是能登上的, 这回<code>ssh -i</code>指定密钥的情况下却仍提示输入密码, 哪怕密码正确(特意重置了😭)也不断提示重新输入密码直到<code>Permission denied</code>, 明明指定密钥不需要再输密码来着, 看来是哪里出了问题, 到控制台网页登录,发现密钥/密码都是ok的, 只好翻翻<a target="_blank" rel="noopener" href="https://cloud.tencent.com/document/product/213/35574#ssh-.E9.97.AE.E9.A2.98.E5.AF.BC.E8.87.B4.E6.97.A0.E6.B3.95.E7.99.BB.E5.BD.95">文档</a>找解决方案</p>
+<h3 id="应对"><a href="#应对" class="headerlink" title="应对"></a>应对</h3><p>一条条对下来发现有条对应<strong>服务器高负载</strong>相关的, 到实例监控上看, 好嘛, cpu果然已经飙到极限了</p>
+<p><img src="tencentdoc.png" alt="tencentdoc"><br><img src="cloudserve.png" alt="cloudserve"></p>
+<ul>
+<li><p>在一通搜索下得知, 通过<code>top</code>命令查看当前cpu运行相关状态</p>
+<p><img src="termial_1.png" alt="termial_1.png"></p>
+</li>
+<li><p>通过输入k 指定pid,我们可以直接kill掉占用cpu过高的trace进程, 但多次杀进程这个trace却总会重启, 接着我们通过<code>PID</code>来找到对应进程和所在目录, pid的查看除<code>top</code>外也可使用</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ps -ef |grep [Pname 进程名]</span><br></pre></td></tr></table></figure>
+<p>从上图的最后运行<code>ps -ef |grep trace</code>的返回可见到一些关键信息, 像什么<code>mine.c3pool.com</code>一看就是老矿工了, <code>2020jenkins</code>可能就是叛变革命的元凶</p>
+</li>
+<li><p>通过<code>PID</code>来找到对应进程和所在目录则使用, 其中 <strong>/proc目录中包含许多以数字命名的子目录，这些数字表示系统当前正在运行进程的进程号，里面包含对应进程相关的多个信息文件</strong></p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">ls -l /proc/[PID]</span><br><span class="line">当然直接 <span class="built_in">cd</span> /proc/[PID] 再 ll也是一样的</span><br><span class="line">再就是</span><br><span class="line">pwdx [PID]</span><br></pre></td></tr></table></figure>
+<p>当时忘了截图, 应该和以下相似, 当时的exe和pwd都指向 <code>/var/jenkins_home/XXX../trace</code>但我服务器本地是没有这个目录的<br><img src="terminal_3.png" alt="terminal"><br>考虑到我的jenkins是docker起的, 马上找到对应的挂载目录, 从<code>jenkins_home</code>一路找到这个<code>trace</code>, 但发现就算将trace删除它也马上会再自动生成😱,接下来通过<strong>jenkins</strong>作为关键字通过网络搜索果然能发现些端倪, 参考<a target="_blank" rel="noopener" href="https://www.jianshu.com/p/70e071113044?from=groupmessage&isappinstalled=0">这篇</a>和<a target="_blank" rel="noopener" href="https://blog.csdn.net/g6U8W7p06dCO99fQ3/article/details/90205674">这篇</a>基本上能确定我碰上的也是这种情况了,登上jenkins一看果然再一直重复跑着几个不是我建的build<br><img src="jenkins_dashbord.png" alt="jenkins_dashbord"></p>
+</li>
+</ul>
+<p>之后处理则是按照以下顺序:</p>
+<ul>
+<li>禁用Jenkins task</li>
+<li>升级Jenkins版本</li>
+<li>检查定时任务脚本</li>
+</ul>
+<h3 id="升级Jenkins版本"><a href="#升级Jenkins版本" class="headerlink" title="升级Jenkins版本"></a>升级Jenkins版本</h3><p>禁用Jenkins task不必多言直接在页面上设置禁用即可, 主要是升级Jenkins版本, 页面上也有提示升级,点击却一直升级失败(可能是网络等原因,关键文件下载失败之类的,这不是很常见吗), 鉴于我的jenkins是docker跑的, 参考网上的一些文章,通过更新容器中的war包来升级jenkins:</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 进入jenkins容器</span></span><br><span class="line">docker <span class="built_in">exec</span> -it [jenkins contanerID] sh</span><br><span class="line"></span><br><span class="line"><span class="comment">#下载新包</span></span><br><span class="line"><span class="built_in">cd</span> /var/jenkins</span><br><span class="line">wget http://mirrors.jenkins.io/war/latest/jenkins.war</span><br><span class="line"></span><br><span class="line"><span class="comment"># 进入war包的存放路径，备份旧包，新包代替</span></span><br><span class="line">somehost$:/<span class="comment"># cd /usr/share/jenkins/</span></span><br><span class="line">somehost$:/usr/share/jenkins<span class="comment"># ls</span></span><br><span class="line">jenkins.war</span><br><span class="line"> </span><br><span class="line">somehost$:/usr/share/jenkins<span class="comment"># mv jenkins.war jenkins.war-bak</span></span><br><span class="line">somehost$:/usr/share/jenkins<span class="comment"># cp /var/jenkins_home/jenkins.war .</span></span><br><span class="line">somehost$:/usr/share/jenkins<span class="comment"># ls</span></span><br><span class="line">jenkins.war  jenkins.war-bak</span><br><span class="line"> </span><br><span class="line">somehost$:/usr/share/jenkins<span class="comment"># exit </span></span><br><span class="line"></span><br><span class="line"><span class="comment">#重启容器</span></span><br><span class="line">docker restart [jenkins contanerID]</span><br></pre></td></tr></table></figure>
+<p>之后重新访问jenkins页面就会发现jenkins在准备升级,稍后就会完成升级, 升级后的jenkins则会提示<a target="_blank" rel="noopener" href="https://wiki.jenkins.io/display/JENKINS/Security+implication+of+building+on+master">已有风险</a><br><img src="jenkins_doc_security.png" alt="jenkins_doc_security"><br>看起来好像说的是通过jenkins controller直接运行的build能直接读写<code>$JENKINS_HOME</code>的文件,相当于能触及像安装插件,读凭证,创建新job等几乎所有操作了, 所以貌似是建议通过其他服务器,来代理跑构建任务(<code>agent</code>), 否则的话就要好好检查下<code>$JENKINS_HOME</code>的权限了, jenkins我暂时用不上,先按上面设置把执行器改成零<br><img src="jenkins_node.png" alt="jenkins_node"></p>
+<h3 id="检查定时任务脚本"><a href="#检查定时任务脚本" class="headerlink" title="检查定时任务脚本"></a>检查定时任务脚本</h3><p>接下来再检查下服务器在跑啥定时脚本</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">crontab -l <span class="comment"># 查看</span></span><br><span class="line">crontab -r <span class="comment"># 清空</span></span><br></pre></td></tr></table></figure>
+<p><img src="terminal_4.png" alt="terminal_4"></p>
+<p>确实发现了个我毫无印象的脚本, 也没多想,直接被我<code>crontab -r</code>了, 一套操作下来<code>top</code>命令查看后, cpu使用已然恢复正常(服务器更本没跑啥,占用率趋近于0了), 罪魁祸首trace也不再复活, 也算是「一件落着/いっけんらくちゃく」</p>
+<h3 id="终局"><a href="#终局" class="headerlink" title="终局"></a>终局</h3><p>解决后回到本地ssh登录服务器,发现仍是</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">root@xxx.xx.xx.xxx<span class="string">&#x27;s password: </span></span><br><span class="line"><span class="string">Permission denied, please try again.</span></span><br><span class="line"><span class="string">root@xxx.xx.xx.xxx&#x27;</span>s password: </span><br><span class="line">root@xxx.xx.xx.xxx: Permission denied (publickey,gssapi-keyex,gssapi-with-mic,pa</span><br><span class="line">ssword)</span><br></pre></td></tr></table></figure>
+<p>fuck sake,这就太令人奇怪啦,参考网上修改 <code>/etc/ssh/ssh_config</code> 开启密码验证, root用户登录等选项重启ssh服务啥的都试了一遍, 还是不管用, 最后的最后发现从最开始本地登录时的公网ip就打错了一位, 真的是知道结局的我眼泪落下来, 残念</p>
+<h3 id="收尾"><a href="#收尾" class="headerlink" title="收尾"></a>收尾</h3><p>登录上服务器就好说了, 把之前的静态文件上传上去就好, 看着自己最最开始写的页面真是感慨万千, 仿佛当时的情感又涌上心头, 可现在的自己又有多少成长呢, 是否又失去了大把可能性, 变得越来越无趣了呢. </p>
+<p>ps. 服务器域名估计今年中旬就到期了,姑且先放着几天吧, <a target="_blank" rel="noopener" href="https://www.mimimimimi.top/">www.mimimimimi.top</a>, 这游戏是我大学要毕业时玩儿的, 当时记得通关一周目普通模式死了300多次, 像素游戏小而精美,很有旺达与巨像的味道, 那几天下来脑袋里都是这款游戏, 哈哈, 毕设要写啥,舍友们都在发愁, 我想着要不然就写个介绍这个游戏的”小网站”吧, 这么多年后它终于被我再次想起,成功上线了😏 </p>
+
+            <!--[if lt IE 9]><script>document.createElement('audio');</script><![endif]-->
+            <audio id="audio" loop="1" preload="auto" controls="controls" data-autoplay="true">
+                <source type="audio/mpeg" src="/music/David Fenn - Titan Souls - 01 Souls.mp3">
+            </audio>
+            
+        </div>
+        
+    <!-- <div id='gitalk-container' class="comment link"
+		data-enable='false'
+        data-ae='false'
+        data-ci=''
+        data-cs=''
+        data-r=''
+        data-o=''
+        data-a=''
+        data-d='false'
+    >查看评论</div> -->
+
+
+    </div>
+    
+</div>
+
+
+    </div>
+</div>
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"debug":false,"pluginModelPath":"assets/","model":{"jsonPath":"/live2dw/assets/koharu.model.json"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":"ture"},"react":{"opacity":0.9},"log":false,"pluginJsPath":"lib/","pluginRootPath":"live2dw/","tagMode":false});</script></body>
+
+
+<script src="//lib.baomitu.com/jquery/1.8.3/jquery.min.js"></script>
+<script src="/js/plugin.js"></script>
+<script src="/js/typed.js"></script>
+<script src="/js/diaspora.js"></script>
+<script src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML.js"></script>
+<script src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+<link rel="stylesheet" href="/photoswipe/photoswipe.css">
+<link rel="stylesheet" href="/photoswipe/default-skin/default-skin.css">
+
+
+<script src="/photoswipe/photoswipe.min.js"></script>
+<script src="/photoswipe/photoswipe-ui-default.min.js"></script>
+
+
+<!-- Root element of PhotoSwipe. Must have class pswp. -->
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+    <!-- Background of PhotoSwipe. 
+         It's a separate element as animating opacity is faster than rgba(). -->
+    <div class="pswp__bg"></div>
+    <!-- Slides wrapper with overflow:hidden. -->
+    <div class="pswp__scroll-wrap">
+        <!-- Container that holds slides. 
+            PhotoSwipe keeps only 3 of them in the DOM to save memory.
+            Don't modify these 3 pswp__item elements, data is added later on. -->
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+        <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
+        <div class="pswp__ui pswp__ui--hidden">
+            <div class="pswp__top-bar">
+                <!--  Controls are self-explanatory. Order can be changed. -->
+                <div class="pswp__counter"></div>
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+                <!-- Preloader demo http://codepen.io/dimsemenov/pen/yyBWoR -->
+                <!-- element will get class pswp__preloader--active when preloader is running -->
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                      <div class="pswp__preloader__cut">
+                        <div class="pswp__preloader__donut"></div>
+                      </div>
+                    </div>
+                </div>
+            </div>
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div> 
+            </div>
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+</html>
