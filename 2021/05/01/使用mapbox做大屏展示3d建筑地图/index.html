@@ -1,0 +1,216 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN" class="loading">
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>使用mapbox做大屏展示3d建筑地图 - wumi&#39;s blog</title>
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="google" content="notranslate" />
+    <meta name="keywords" content="wumi,"> 
+    <meta name="description" content="wumi&#39;s blog,简单记录下使用 mapbox 展示 3d 建筑物地图
+使用map studio制作的样式
+12345678910111213141516171819let map = new mapboxgl.Ma,"> 
+    <meta name="author" content="5mi"> 
+    <link rel="alternative" href="atom.xml" title="wumi&#39;s blog" type="application/atom+xml"> 
+    <link rel="icon" href="/img/favicon.png"> 
+    
+    
+<link rel="stylesheet" href="/css/diaspora.css">
+
+    <link rel="stylesheet" href="//at.alicdn.com/t/font_2511899_nhreworgr7.css">
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+<body class="loading">
+    <span id="config-title" style="display:none">wumi&#39;s blog</span>
+    <div id="loader"></div>
+    <div id="single">
+    <div id="top" style="display: block;">
+    <div class="bar" style="width: 0;"></div>
+    <a class="iconfont icon-home image-icon" href="javascript:;" data-url="/"></a>
+    <div title="播放/暂停" class="iconfont icon-play"></div>
+    <h3 class="subtitle">使用mapbox做大屏展示3d建筑地图</h3>
+    <div class="social">
+        <div>
+            <div class="share">
+                <a title="获取二维码" class="iconfont icon-scan" href="javascript:;"></a>
+            </div>
+            <div id="qr"></div>
+        </div>
+    </div>
+    <div class="scrollbar"></div>
+</div>
+
+    <div class="section">
+        <div class="article">
+    <div class='main'>
+        <h1 class="title">使用mapbox做大屏展示3d建筑地图</h1>
+        <div class="stuff">
+            <span>五月 01, 2021</span>
+            
+                <!-- 不蒜子统计 -->
+                <span id="busuanzi_container_page_pv" style='display:none'>
+                      <i class="iconfont-for-blog icon-for-blogbook"></i> <span id="busuanzi_value_page_pv"></span>
+                </span>
+            
+            
+  <ul class="post-tags-list" itemprop="keywords"><li class="post-tags-list-item"><a class="post-tags-list-link" href="/tags/%E5%B7%A5%E4%BD%9C%E4%B8%AD/" rel="tag">工作中</a></li></ul>
+
+
+        </div>
+        <div class="content markdown">
+            <p>简单记录下使用 mapbox 展示 3d 建筑物地图</p>
+<h4 id="使用map-studio制作的样式"><a href="#使用map-studio制作的样式" class="headerlink" title="使用map studio制作的样式"></a>使用map studio制作的样式</h4><p><img src="mapbox-studio.png" alt="map studio"></p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> map = <span class="keyword">new</span> mapboxgl.Map(&#123;</span><br><span class="line">  version: <span class="number">8</span>,</span><br><span class="line">  name: <span class="string">&quot;Basic&quot;</span>,</span><br><span class="line">  center: [<span class="number">120.31463022979744</span>, <span class="number">36.06658532033572</span>],</span><br><span class="line">  <span class="comment">// center: [116.89909930420157, 36.666567085091614],</span></span><br><span class="line">  zoom: <span class="number">16</span>,</span><br><span class="line">  bearing: <span class="number">11.199999999999818</span>,</span><br><span class="line">  pitch: <span class="number">60</span>,</span><br><span class="line">  sources: &#123;</span><br><span class="line">    composite: &#123;</span><br><span class="line">      url: <span class="string">&quot;mapbox://mapbox.mapbox-streets-v8&quot;</span>,</span><br><span class="line">      type: <span class="string">&quot;vector&quot;</span>,</span><br><span class="line">    &#125;,</span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="comment">// 使用 mapbox studio制作分享的样式</span></span><br><span class="line">  style: <span class="string">&quot;mapbox://styles/wumi/ckew6c8b60g2s19pij43gk4ft&quot;</span>,</span><br><span class="line">  container: <span class="string">&quot;map&quot;</span>,</span><br><span class="line">  antialias: <span class="literal">true</span>,</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<h4 id="3d-buildings"><a href="#3d-buildings" class="headerlink" title="3d-buildings"></a><a target="_blank" rel="noopener" href="https://docs.mapbox.com/mapbox-gl-js/example/3d-buildings/">3d-buildings</a></h4><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> layers = map.getStyle().layers</span><br><span class="line"></span><br><span class="line">     <span class="keyword">var</span> labelLayerId</span><br><span class="line">     <span class="keyword">for</span> (<span class="keyword">var</span> i = <span class="number">0</span>; i &lt; layers.length; i++) &#123;</span><br><span class="line">       <span class="keyword">if</span> (layers[i].type === <span class="string">&#x27;symbol&#x27;</span> &amp;&amp; layers[i].layout[<span class="string">&#x27;text-field&#x27;</span>]) &#123;</span><br><span class="line">         labelLayerId = layers[i].id</span><br><span class="line">         <span class="keyword">break</span></span><br><span class="line">       &#125;</span><br><span class="line">     &#125;</span><br><span class="line">     <span class="comment">// layer 3d buliding</span></span><br><span class="line">     map.addLayer(</span><br><span class="line">       &#123;</span><br><span class="line">         id: <span class="string">&#x27;3d-buildings&#x27;</span>,</span><br><span class="line">         source: <span class="string">&#x27;composite&#x27;</span>,</span><br><span class="line">         <span class="string">&#x27;source-layer&#x27;</span>: <span class="string">&#x27;building&#x27;</span>,</span><br><span class="line">         filter: [<span class="string">&#x27;==&#x27;</span>, <span class="string">&#x27;extrude&#x27;</span>, <span class="string">&#x27;true&#x27;</span>],</span><br><span class="line">         type: <span class="string">&#x27;fill-extrusion&#x27;</span>,</span><br><span class="line">         minzoom: <span class="number">15</span>,</span><br><span class="line">         paint: &#123;</span><br><span class="line">           <span class="string">&#x27;fill-extrusion-color&#x27;</span>: [<span class="string">&#x27;interpolate&#x27;</span>, [<span class="string">&#x27;exponential&#x27;</span>, <span class="number">1</span>], [<span class="string">&#x27;get&#x27;</span>, <span class="string">&#x27;height&#x27;</span>], <span class="number">0</span>, <span class="string">&#x27;hsl(175, 59%, 51%)&#x27;</span>, <span class="number">50</span>, <span class="string">&#x27;hsl(244, 81%, 46%)&#x27;</span>],</span><br><span class="line"></span><br><span class="line">           <span class="comment">// 使用“插值”表达式为</span></span><br><span class="line">           <span class="comment">// 建筑物作为用户放大</span></span><br><span class="line">           <span class="string">&#x27;fill-extrusion-height&#x27;</span>: [<span class="string">&#x27;interpolate&#x27;</span>, [<span class="string">&#x27;linear&#x27;</span>], [<span class="string">&#x27;zoom&#x27;</span>], <span class="number">15</span>, <span class="number">0</span>, <span class="number">15.05</span>, [<span class="string">&#x27;get&#x27;</span>, <span class="string">&#x27;height&#x27;</span>]],</span><br><span class="line">           <span class="string">&#x27;fill-extrusion-base&#x27;</span>: [<span class="string">&#x27;interpolate&#x27;</span>, [<span class="string">&#x27;linear&#x27;</span>], [<span class="string">&#x27;zoom&#x27;</span>], <span class="number">15</span>, <span class="number">0</span>, <span class="number">15.05</span>, [<span class="string">&#x27;get&#x27;</span>, <span class="string">&#x27;min_height&#x27;</span>]],</span><br><span class="line">           <span class="string">&#x27;fill-extrusion-opacity&#x27;</span>: <span class="number">0.6</span></span><br><span class="line">         &#125;</span><br><span class="line">       &#125;,</span><br><span class="line">       labelLayerId</span><br><span class="line">     )</span><br></pre></td></tr></table></figure>
+
+<h4 id="添加-GeoJSON-多边形"><a href="#添加-GeoJSON-多边形" class="headerlink" title="添加 GeoJSON 多边形"></a><a target="_blank" rel="noopener" href="https://www.mapbox.cn/mapbox-gl-js/example/geojson-polygon/">添加 GeoJSON 多边形</a></h4><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// layer fill geojson https://www.mapbox.cn/mapbox-gl-js/example/geojson-polygon/</span></span><br><span class="line">map.addLayer(&#123;</span><br><span class="line">  id: <span class="string">&quot;geoPolygon_2&quot;</span>,</span><br><span class="line">  type: <span class="string">&quot;fill&quot;</span>,</span><br><span class="line">  source: &#123;</span><br><span class="line">    type: <span class="string">&quot;geojson&quot;</span>,</span><br><span class="line">    data: &#123;</span><br><span class="line">      type: <span class="string">&quot;Feature&quot;</span>,</span><br><span class="line">      geometry: &#123;</span><br><span class="line">        type: <span class="string">&quot;Polygon&quot;</span>,</span><br><span class="line">        coordinates: [</span><br><span class="line">          [</span><br><span class="line">            [<span class="number">120.31386645128458</span>, <span class="number">36.07352407299466</span>],</span><br><span class="line">            [<span class="number">120.31406051266816</span>, <span class="number">36.06973548187716</span>],</span><br><span class="line">            [<span class="number">120.31703395879913</span>, <span class="number">36.067476673147524</span>],</span><br><span class="line">            [<span class="number">120.31903338030969</span>, <span class="number">36.06914023164856</span>],</span><br><span class="line">            [<span class="number">120.31725031669936</span>, <span class="number">36.072912209593554</span>],</span><br><span class="line">            [<span class="number">120.31386645128458</span>, <span class="number">36.07352407299466</span>],</span><br><span class="line">            <span class="comment">// [116.90015862619504, 36.67485225304701],</span></span><br><span class="line">            <span class="comment">// [116.89925746159167, 36.66643736142822],</span></span><br><span class="line">            <span class="comment">// [116.90449322417288, 36.66646071375989],</span></span><br><span class="line">            <span class="comment">// [116.90474640425532, 36.674772049527036],</span></span><br><span class="line">            <span class="comment">// [116.90015862619504, 36.67485225304701]</span></span><br><span class="line">          ],</span><br><span class="line">        ],</span><br><span class="line">      &#125;,</span><br><span class="line">    &#125;,</span><br><span class="line">  &#125;,</span><br><span class="line">  layout: &#123;&#125;,</span><br><span class="line">  paint: &#123;</span><br><span class="line">    <span class="string">&quot;fill-color&quot;</span>: <span class="string">&quot;#0becff&quot;</span>,</span><br><span class="line">    <span class="string">&quot;fill-opacity&quot;</span>: <span class="number">0.5</span>,</span><br><span class="line">    <span class="string">&quot;fill-outline-color&quot;</span>: <span class="string">&quot;#15def2&quot;</span>,</span><br><span class="line">  &#125;,</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<h4 id="添加弹层"><a href="#添加弹层" class="headerlink" title="添加弹层"></a><a target="_blank" rel="noopener" href="https://www.mapbox.cn/mapbox-gl-js/api/#popup">添加弹层</a></h4><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// add marker popup</span></span><br><span class="line">      <span class="keyword">var</span> popup = <span class="keyword">new</span> mapboxgl.Popup(&#123;</span><br><span class="line">        offset: [<span class="number">180</span>, -<span class="number">20</span>],</span><br><span class="line">        className: <span class="string">&#x27;IBM_popup&#x27;</span>,</span><br><span class="line">        maxWidth: <span class="string">&#x27;none&#x27;</span></span><br><span class="line">      &#125;).setText(<span class="string">&#x27;某某站&#x27;</span>)</span><br><span class="line">      <span class="comment">// create DOM element for the marker</span></span><br><span class="line">      <span class="keyword">var</span> el = <span class="built_in">document</span>.createElement(<span class="string">&#x27;div&#x27;</span>)</span><br><span class="line">      el.innerHTML = <span class="string">&#x27;&lt;span&gt;点位&lt;/span&gt;&#x27;</span></span><br><span class="line">      el.id = <span class="string">&#x27;marker&#x27;</span></span><br><span class="line"></span><br><span class="line">      <span class="comment">// create the marker</span></span><br><span class="line">      <span class="keyword">new</span> mapboxgl.Marker(el)</span><br><span class="line">        .setLngLat([<span class="number">120.31319853001287</span>, <span class="number">36.069633414671344</span>])</span><br><span class="line">        <span class="comment">// .setLngLat([116.89759274743653, 36.66859665993769])</span></span><br><span class="line">        .setPopup(popup) <span class="comment">// sets a popup on this marker</span></span><br><span class="line">        .addTo(map)</span><br><span class="line">    &#125;)</span><br></pre></td></tr></table></figure>
+
+<h4 id="最后效果"><a href="#最后效果" class="headerlink" title="最后效果"></a>最后效果</h4><p><img src="mapbox1.png" alt="map1"><br><img src="mapbox2.png" alt="map1"><br><img src="mapbox3.png" alt="map1"></p>
+<p><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/65248694">Mapbox Studio</a></p>
+<p>先挖个坑 😂 <a target="_blank" rel="noopener" href="https://gitee.com/workthing/ruoyuan">demo地址</a></p>
+
+            <!--[if lt IE 9]><script>document.createElement('audio');</script><![endif]-->
+            <audio id="audio" loop="1" preload="auto" controls="controls" data-autoplay="true">
+                <source type="audio/mpeg" src="">
+            </audio>
+            
+                <ul id="audio-list" style="display:none">
+                    
+                        
+                            <li title='0' data-url='/music/Saito - 愛撫 「Saito Ｘ ＡＰＯ」.mp3'></li>
+                        
+                    
+                        
+                            <li title='1' data-url='/music/坂本龍一 - Merry Christmas Mr.Lawrence.mp3'></li>
+                        
+                    
+                        
+                            <li title='2' data-url='/music/茶太 (ちゃた) - 晴れ→恋心 (晴朗→恋心) [mqms2].mp3'></li>
+                        
+                    
+                        
+                            <li title='3' data-url='/music/光宗信吉 - Lost in Love.mp3'></li>
+                        
+                    
+                        
+                            <li title='4' data-url='/music/光宗信吉 - 恋ってもどかしい.mp3'></li>
+                        
+                    
+                        
+                            <li title='5' data-url='/music/菅野祐悟 - 美春の告白.mp3'></li>
+                        
+                    
+                        
+                            <li title='6' data-url='/music/麻枝准 - 夏影.mp3'></li>
+                        
+                    
+                        
+                            <li title='7' data-url='/music/山冈晃 (AKIRA YAMAOKA) - Promise [mqms2].mp3'></li>
+                        
+                    
+                        
+                            <li title='8' data-url='/music/上松範康 - 運命-SADAME-.mp3'></li>
+                        
+                    
+                </ul>
+            
+        </div>
+        
+    <!-- <div id='gitalk-container' class="comment link"
+		data-enable='false'
+        data-ae='false'
+        data-ci=''
+        data-cs=''
+        data-r=''
+        data-o=''
+        data-a=''
+        data-d='false'
+    >查看评论</div> -->
+
+
+    </div>
+    
+</div>
+
+
+    </div>
+</div>
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"debug":false,"pluginModelPath":"assets/","model":{"jsonPath":"/live2dw/assets/koharu.model.json"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":"ture"},"react":{"opacity":0.9},"log":false,"pluginJsPath":"lib/","pluginRootPath":"live2dw/","tagMode":false});</script></body>
+
+
+<script src="//lib.baomitu.com/jquery/1.8.3/jquery.min.js"></script>
+<script src="/js/plugin.js"></script>
+<script src="/js/typed.js"></script>
+<script src="/js/diaspora.js"></script>
+<script src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML.js"></script>
+<script src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+<link rel="stylesheet" href="/photoswipe/photoswipe.css">
+<link rel="stylesheet" href="/photoswipe/default-skin/default-skin.css">
+
+
+<script src="/photoswipe/photoswipe.min.js"></script>
+<script src="/photoswipe/photoswipe-ui-default.min.js"></script>
+
+
+<!-- Root element of PhotoSwipe. Must have class pswp. -->
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+    <!-- Background of PhotoSwipe. 
+         It's a separate element as animating opacity is faster than rgba(). -->
+    <div class="pswp__bg"></div>
+    <!-- Slides wrapper with overflow:hidden. -->
+    <div class="pswp__scroll-wrap">
+        <!-- Container that holds slides. 
+            PhotoSwipe keeps only 3 of them in the DOM to save memory.
+            Don't modify these 3 pswp__item elements, data is added later on. -->
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+        <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
+        <div class="pswp__ui pswp__ui--hidden">
+            <div class="pswp__top-bar">
+                <!--  Controls are self-explanatory. Order can be changed. -->
+                <div class="pswp__counter"></div>
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+                <!-- Preloader demo http://codepen.io/dimsemenov/pen/yyBWoR -->
+                <!-- element will get class pswp__preloader--active when preloader is running -->
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                      <div class="pswp__preloader__cut">
+                        <div class="pswp__preloader__donut"></div>
+                      </div>
+                    </div>
+                </div>
+            </div>
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div> 
+            </div>
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+</html>
