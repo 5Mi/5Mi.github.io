@@ -1,0 +1,234 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN" class="loading">
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>使用fabric完成多边形选区 - wumi&#39;s blog</title>
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="google" content="notranslate" />
+    <meta name="keywords" content="wumi,"> 
+    <meta name="description" content="wumi&#39;s blog,
+之前有过这么个需求, 说是要在图片中选区(车站,广场等),然后选区的要求是不规则凸多边形 按点连接, 之后要获取选区点坐标, 同时也有将生成点坐标回显展示选区的需求, 在一番调研之后决定使用fab,"> 
+    <meta name="author" content="5mi"> 
+    <link rel="alternative" href="atom.xml" title="wumi&#39;s blog" type="application/atom+xml"> 
+    <link rel="icon" href="/img/favicon.png"> 
+    
+    
+<link rel="stylesheet" href="/css/diaspora.css">
+
+    <link rel="stylesheet" href="//at.alicdn.com/t/font_2511899_nhreworgr7.css">
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+<body class="loading">
+    <span id="config-title" style="display:none">wumi&#39;s blog</span>
+    <div id="loader"></div>
+    <div id="single">
+    <div id="top" style="display: block;">
+    <div class="bar" style="width: 0;"></div>
+    <a class="iconfont icon-home image-icon" href="javascript:;" data-url="/"></a>
+    <div title="播放/暂停" class="iconfont icon-play"></div>
+    <h3 class="subtitle">使用fabric完成多边形选区</h3>
+    <div class="social">
+        <div>
+            <div class="share">
+                <a title="获取二维码" class="iconfont icon-scan" href="javascript:;"></a>
+            </div>
+            <div id="qr"></div>
+        </div>
+    </div>
+    <div class="scrollbar"></div>
+</div>
+
+    <div class="section">
+        <div class="article">
+    <div class='main'>
+        <h1 class="title">使用fabric完成多边形选区</h1>
+        <div class="stuff">
+            <span>五月 06, 2021</span>
+            
+                <!-- 不蒜子统计 -->
+                <span id="busuanzi_container_page_pv" style='display:none'>
+                      <i class="iconfont-for-blog icon-for-blogbook"></i> <span id="busuanzi_value_page_pv"></span>
+                </span>
+            
+            
+  <ul class="post-tags-list" itemprop="keywords"><li class="post-tags-list-item"><a class="post-tags-list-link" href="/tags/%E5%B7%A5%E4%BD%9C%E4%B8%AD/" rel="tag">工作中</a></li></ul>
+
+
+        </div>
+        <div class="content markdown">
+            <p><img src="draw.gif" alt="a"></p>
+<p>之前有过这么个需求, 说是要在图片中选区(车站,广场等),然后选区的要求是<strong>不规则凸多边形</strong> <strong>按点连接</strong>, 之后要获取选区点坐标, 同时也有将生成点坐标回显展示选区的需求, 在一番调研之后决定使用<a target="_blank" rel="noopener" href="http://fabricjs.com/">fabric.js</a>来实现功能</p>
+<blockquote>
+<p>Fabric是一个强大而简单的JS Canvas库，我们能通过使用它实现在Canvas上创建、填充图形、给图形填充渐变颜色。 组合图形（包括组合图形、图形文字、图片等）等一系列功能。简单来说我们可以通过使用Fabric从而以较为简单的方式实现较为复杂的Canvas功能</p>
+</blockquote>
+<h3 id="思路"><a href="#思路" class="headerlink" title="思路"></a>思路</h3><p>整个的思路大概是先初始化fabric实例,将图片展示到canvas上,根据图片和canvas的尺寸得到缩放比例,方便将后续得到的点坐标按图片尺寸还原.接着通过鼠标点击在canvas上绘制点,将点按照点击顺序连接成线,则得到多边形的边,此时三个点以上则可连接成多边形,当点击完成时将<strong>起始点</strong>与<strong>终点</strong>连接闭合成多边形.</p>
+<p><img src="draw-close.png" alt="draw-close"></p>
+<p>其中核心的问题则是按顺序连接的点,当图形完成,起始点和终点连接时,选区图形是否能成为一个多边形?此处我采用的方式是, 通过鼠标移动,可以落点时鼠标同首尾点连接虚线,当无法绘制所需多边形时隐藏虚线并<strong>无法落点</strong>,确保已经绘制的点之间可连成多边形</p>
+<p><img src="draw-cross.png" alt="draw-cross"></p>
+<p>即核心的判断则是:</p>
+<ul>
+<li>起始点与鼠标连线:line1,终点与鼠标连线:line2,则line1,line2是否<strong>同时</strong>与已连接的线段<strong>相交</strong>, 同时相交则无法落点<br><img src="draw2.png" alt="draw2"></li>
+<li><strong>已连接线段中除首尾两条外</strong>, 是否存在line1<strong>或</strong>line2与某条线段相交, 相交则无法落点<br><img src="draw3.png" alt="draw3"></li>
+<li>通过向量叉乘判断线段相交<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 计算向量叉乘</span></span><br><span class="line">  <span class="function"><span class="keyword">function</span> <span class="title">crossMul</span>(<span class="params">v1, v2</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> v1.x * v2.y - v1.y * v2.x;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="comment">// 判断两条线段是否相交line1(p1,p2) line2(p3,p4)</span></span><br><span class="line">  <span class="function"><span class="keyword">function</span> <span class="title">checkCross</span>(<span class="params">p1, p2, p3, p4</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">var</span> v1 = &#123; <span class="attr">x</span>: p1.x - p3.x, <span class="attr">y</span>: p1.y - p3.y &#125;,</span><br><span class="line">      v2 = &#123; <span class="attr">x</span>: p2.x - p3.x, <span class="attr">y</span>: p2.y - p3.y &#125;,</span><br><span class="line">      v3 = &#123; <span class="attr">x</span>: p4.x - p3.x, <span class="attr">y</span>: p4.y - p3.y &#125;,</span><br><span class="line">      v = crossMul(v1, v3) * crossMul(v2, v3);</span><br><span class="line">    v1 = &#123; <span class="attr">x</span>: p3.x - p1.x, <span class="attr">y</span>: p3.y - p1.y &#125;;</span><br><span class="line">    v2 = &#123; <span class="attr">x</span>: p4.x - p1.x, <span class="attr">y</span>: p4.y - p1.y &#125;;</span><br><span class="line">    v3 = &#123; <span class="attr">x</span>: p2.x - p1.x, <span class="attr">y</span>: p2.y - p1.y &#125;;</span><br><span class="line">    <span class="keyword">return</span> v &lt;= <span class="number">0</span> &amp;&amp; crossMul(v1, v3) * crossMul(v2, v3) &lt;= <span class="number">0</span></span><br><span class="line">      ? <span class="literal">true</span></span><br><span class="line">      : <span class="literal">false</span>;</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure></li>
+</ul>
+<hr>
+<h3 id="实现"><a href="#实现" class="headerlink" title="实现"></a>实现</h3><p>首先页面上要有个canvas容器,据此生成fabric的canvas实例,还要将图片展示在canvas中,然后根据图片尺寸,canvas尺寸得到展示的缩放比例<code>radio</code></p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> convasDefaultWidth = <span class="number">500</span>;</span><br><span class="line">      <span class="comment">//</span></span><br><span class="line">      <span class="keyword">var</span> image = <span class="keyword">new</span> fabric.Image(<span class="built_in">document</span>.getElementById(<span class="string">&quot;image&quot;</span>));</span><br><span class="line">      <span class="keyword">var</span> imageWidth = image.get(<span class="string">&quot;width&quot;</span>);</span><br><span class="line">      <span class="keyword">var</span> canvasWidth =</span><br><span class="line">        imageWidth &gt; convasDefaultWidth ? convasDefaultWidth : imageWidth;</span><br><span class="line">      <span class="comment">// 缩放比例</span></span><br><span class="line">      <span class="keyword">var</span> radio = imageWidth / canvasWidth;</span><br><span class="line">      <span class="comment">// fabfric实例</span></span><br><span class="line">      <span class="keyword">var</span> canvas = <span class="keyword">new</span> fabric.Canvas(<span class="string">&quot;canvas&quot;</span>, &#123;</span><br><span class="line">        width: canvasWidth,</span><br><span class="line">        height: image.get(<span class="string">&quot;height&quot;</span>) / radio,</span><br><span class="line">        backgroundImage: image.scaleToWidth(canvasWidth),</span><br><span class="line">        backgroundColor: <span class="string">&#x27;transparent&#x27;</span>,</span><br><span class="line">        selection:<span class="literal">false</span></span><br><span class="line">      &#125;);</span><br></pre></td></tr></table></figure>
+<p>当绘制完成或回显时, 直接使用fabric绘制多边形即可</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> polygon = <span class="keyword">new</span> fabric.Polygon([], &#123;</span><br><span class="line">        strokeWidth: <span class="number">2</span>,</span><br><span class="line">        stroke: <span class="string">&quot;green&quot;</span>,</span><br><span class="line">        fill: <span class="string">&quot;transparent&quot;</span>,</span><br><span class="line">        objectCaching: <span class="literal">false</span>,</span><br><span class="line">        <span class="comment">// transparentCorners: false,</span></span><br><span class="line">        <span class="comment">// cornerColor: &quot;blue&quot;,</span></span><br><span class="line">      &#125;);</span><br><span class="line">      <span class="comment">// 添加到画布</span></span><br><span class="line">      canvas.add(polygon);</span><br></pre></td></tr></table></figure>
+<p>初始化各个状态,以及将来鼠标显示的连接线等</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 已绘制点</span></span><br><span class="line"><span class="keyword">var</span> points = [];</span><br><span class="line"><span class="comment">// 当前是否可以落点</span></span><br><span class="line"><span class="keyword">var</span> canAddPoint = <span class="literal">true</span>;</span><br><span class="line"><span class="comment">// 已存在线段</span></span><br><span class="line"><span class="keyword">var</span> existLines = [];</span><br><span class="line"><span class="comment">// 绘制是否完成</span></span><br><span class="line"><span class="keyword">var</span> isCompelete = <span class="literal">false</span>;</span><br><span class="line"><span class="comment">// 线段默认配置</span></span><br><span class="line"><span class="keyword">var</span> lineOption = &#123;</span><br><span class="line">  strokeWidth: <span class="number">2</span>,</span><br><span class="line">  stroke: <span class="string">&quot;green&quot;</span>,</span><br><span class="line">  fill: <span class="string">&quot;green&quot;</span>,</span><br><span class="line">  selectable: <span class="literal">false</span>,</span><br><span class="line">  evented: <span class="literal">false</span></span><br><span class="line">&#125;;</span><br><span class="line"><span class="comment">// 连接线使用虚线</span></span><br><span class="line"><span class="keyword">var</span> dashLineOption = <span class="built_in">Object</span>.assign(&#123;&#125;,lineOption,&#123;<span class="attr">strokeDashArray</span>: [<span class="number">10</span>, <span class="number">15</span>]&#125;)</span><br><span class="line"><span class="comment">// 鼠标连接线</span></span><br><span class="line"><span class="keyword">var</span> combineLineWithFirst = <span class="keyword">new</span> fabric.Line([<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>], dashLineOption);</span><br><span class="line"><span class="keyword">var</span> combineLineWithSecond = <span class="keyword">new</span> fabric.Line([<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>], dashLineOption);</span><br><span class="line"><span class="comment">// 添加至canvas</span></span><br><span class="line">canvas.add(combineLineWithFirst);</span><br><span class="line">canvas.add(combineLineWithSecond);</span><br></pre></td></tr></table></figure>
+<p>初始化fabric canvas的鼠标事件,即鼠标移动和点击</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 移动</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">canvasHandleMouseMove</span>(<span class="params">options</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">var</span> pointsLen = points.length;</span><br><span class="line">  <span class="keyword">if</span> (pointsLen === <span class="number">0</span>) <span class="keyword">return</span>;</span><br><span class="line">  <span class="comment">// 起点与终点</span></span><br><span class="line">  <span class="keyword">var</span> firstPoint = points[<span class="number">0</span>];</span><br><span class="line">  <span class="keyword">var</span> lastPoint = points[pointsLen - <span class="number">1</span>];</span><br><span class="line">  <span class="comment">// 两点以上</span></span><br><span class="line">  <span class="keyword">if</span> (pointsLen &gt; <span class="number">2</span>) &#123;</span><br><span class="line">    <span class="comment">// 已绘制的线段</span></span><br><span class="line">    <span class="keyword">var</span> exlines = getLinesArr();</span><br><span class="line">    <span class="keyword">var</span> hasCross = <span class="literal">false</span>;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">var</span> i = <span class="number">0</span>; i &lt; exlines.length; i++) &#123;</span><br><span class="line">      <span class="keyword">var</span> perline = exlines[i];</span><br><span class="line">      <span class="keyword">var</span> point1 = &#123; <span class="attr">x</span>: perline[<span class="number">0</span>], <span class="attr">y</span>: perline[<span class="number">1</span>] &#125;;</span><br><span class="line">      <span class="keyword">var</span> point2 = &#123; <span class="attr">x</span>: perline[<span class="number">2</span>], <span class="attr">y</span>: perline[<span class="number">3</span>] &#125;;</span><br><span class="line">      <span class="comment">// 根据之前所说的判断条件</span></span><br><span class="line">      <span class="comment">// line1,line2是否同时与已连接的线段相交</span></span><br><span class="line">      <span class="comment">// 或 存在line1或line2与某条线段相交</span></span><br><span class="line">      <span class="keyword">if</span> (</span><br><span class="line">        checkCross(options.pointer, firstPoint, point1, point2) &amp;&amp;</span><br><span class="line">        checkCross(options.pointer, lastPoint, point1, point2)</span><br><span class="line">      ) &#123;</span><br><span class="line">        hasCross = <span class="literal">true</span>;</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">      &#125; <span class="keyword">else</span> <span class="keyword">if</span> (i &gt; <span class="number">0</span> &amp;&amp; i &lt; exlines.length - <span class="number">1</span> &amp;&amp; (checkCross(options.pointer, firstPoint, point1, point2) ||</span><br><span class="line">      checkCross(options.pointer, lastPoint, point1, point2)))&#123;</span><br><span class="line">        hasCross = <span class="literal">true</span>;</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="comment">// 能落点, 绘制鼠标连接线</span></span><br><span class="line">  <span class="keyword">if</span> (!hasCross) &#123;</span><br><span class="line">    canAddPoint = <span class="literal">true</span>;</span><br><span class="line">    setLineWithPoint(combineLineWithFirst, options.pointer, firstPoint);</span><br><span class="line">    setLineWithPoint(combineLineWithSecond, options.pointer, lastPoint);</span><br><span class="line">  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    <span class="comment">// 隐藏鼠标连接线</span></span><br><span class="line">    canAddPoint = <span class="literal">false</span>;</span><br><span class="line">    setLineWithPoint(combineLineWithFirst);</span><br><span class="line">    setLineWithPoint(combineLineWithSecond);</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="comment">// fabric 绘制</span></span><br><span class="line">  canvas.renderAll();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 点击</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">canvasHandleMouseDown</span>(<span class="params">options</span>) </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (!canAddPoint) <span class="keyword">return</span>;</span><br><span class="line">        <span class="comment">//</span></span><br><span class="line">        <span class="keyword">var</span> pointsLen = points.length;</span><br><span class="line">        <span class="keyword">var</span> lastPoint = points[pointsLen - <span class="number">1</span>];</span><br><span class="line">        <span class="keyword">if</span> (</span><br><span class="line">          lastPoint &amp;&amp;</span><br><span class="line">          options.pointer.x === lastPoint.x &amp;&amp;</span><br><span class="line">          options.pointer.y === lastPoint.y</span><br><span class="line">        )</span><br><span class="line">          <span class="keyword">return</span>;</span><br><span class="line">        <span class="comment">// console.log(options, options.pointer.x, options.pointer.y);</span></span><br><span class="line">        <span class="comment">// 落点, 注意精度</span></span><br><span class="line">        points.push(&#123;</span><br><span class="line">          x: +options.pointer.x.toFixed(<span class="number">3</span>),</span><br><span class="line">          y: +options.pointer.y.toFixed(<span class="number">3</span>),</span><br><span class="line">        &#125;);</span><br><span class="line">        <span class="comment">// 落点连接线段</span></span><br><span class="line">        <span class="keyword">if</span> (lastPoint) &#123;</span><br><span class="line">          <span class="keyword">var</span> line = <span class="keyword">new</span> fabric.Line(</span><br><span class="line">            [lastPoint.x, lastPoint.y, options.pointer.x, options.pointer.y],</span><br><span class="line">            lineOption</span><br><span class="line">          );</span><br><span class="line">          canvas.add(line);</span><br><span class="line">          existLines.push(line);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        canvas.requestRenderAll();</span><br><span class="line">      &#125;</span><br></pre></td></tr></table></figure>
+
+<p>当绘制完成或回显时则将鼠标连接线隐藏, 切换完成状态, 通过已绘制的点连接生成多边形,而重置则清空画布并重置状态即可</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 多边形回显</span></span><br><span class="line">      <span class="function"><span class="keyword">function</span> <span class="title">drowPolygon</span>(<span class="params">points</span>) </span>&#123;</span><br><span class="line">        isCompelete = <span class="literal">true</span>;</span><br><span class="line">        polygon.set(<span class="string">&quot;points&quot;</span>, points);</span><br><span class="line">      &#125;</span><br></pre></td></tr></table></figure>
+
+<p>后续再优化的话 其实可以开放fabric多边形的锚点拖拽,旋转,形变等等</p>
+<p><a target="_blank" rel="noopener" href="https://gitee.com/workthing/canvas_polycon">demo完整代码</a></p>
+
+            <!--[if lt IE 9]><script>document.createElement('audio');</script><![endif]-->
+            <audio id="audio" loop="1" preload="auto" controls="controls" data-autoplay="true">
+                <source type="audio/mpeg" src="">
+            </audio>
+            
+                <ul id="audio-list" style="display:none">
+                    
+                        
+                            <li title='0' data-url='/music/Saito - 愛撫 「Saito Ｘ ＡＰＯ」.mp3'></li>
+                        
+                    
+                        
+                            <li title='1' data-url='/music/坂本龍一 - Merry Christmas Mr.Lawrence.mp3'></li>
+                        
+                    
+                        
+                            <li title='2' data-url='/music/茶太 (ちゃた) - 晴れ→恋心 (晴朗→恋心) [mqms2].mp3'></li>
+                        
+                    
+                        
+                            <li title='3' data-url='/music/光宗信吉 - Lost in Love.mp3'></li>
+                        
+                    
+                        
+                            <li title='4' data-url='/music/光宗信吉 - 恋ってもどかしい.mp3'></li>
+                        
+                    
+                        
+                            <li title='5' data-url='/music/菅野祐悟 - 美春の告白.mp3'></li>
+                        
+                    
+                        
+                            <li title='6' data-url='/music/麻枝准 - 夏影.mp3'></li>
+                        
+                    
+                        
+                            <li title='7' data-url='/music/山冈晃 (AKIRA YAMAOKA) - Promise [mqms2].mp3'></li>
+                        
+                    
+                        
+                            <li title='8' data-url='/music/上松範康 - 運命-SADAME-.mp3'></li>
+                        
+                    
+                </ul>
+            
+        </div>
+        
+    <!-- <div id='gitalk-container' class="comment link"
+		data-enable='false'
+        data-ae='false'
+        data-ci=''
+        data-cs=''
+        data-r=''
+        data-o=''
+        data-a=''
+        data-d='false'
+    >查看评论</div> -->
+
+
+    </div>
+    
+</div>
+
+
+    </div>
+</div>
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"debug":false,"pluginModelPath":"assets/","model":{"jsonPath":"/live2dw/assets/koharu.model.json"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":"ture"},"react":{"opacity":0.9},"log":false,"pluginJsPath":"lib/","pluginRootPath":"live2dw/","tagMode":false});</script></body>
+
+
+<script src="//lib.baomitu.com/jquery/1.8.3/jquery.min.js"></script>
+<script src="/js/plugin.js"></script>
+<script src="/js/typed.js"></script>
+<script src="/js/diaspora.js"></script>
+<script src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML.js"></script>
+<script src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+<link rel="stylesheet" href="/photoswipe/photoswipe.css">
+<link rel="stylesheet" href="/photoswipe/default-skin/default-skin.css">
+
+
+<script src="/photoswipe/photoswipe.min.js"></script>
+<script src="/photoswipe/photoswipe-ui-default.min.js"></script>
+
+
+<!-- Root element of PhotoSwipe. Must have class pswp. -->
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+    <!-- Background of PhotoSwipe. 
+         It's a separate element as animating opacity is faster than rgba(). -->
+    <div class="pswp__bg"></div>
+    <!-- Slides wrapper with overflow:hidden. -->
+    <div class="pswp__scroll-wrap">
+        <!-- Container that holds slides. 
+            PhotoSwipe keeps only 3 of them in the DOM to save memory.
+            Don't modify these 3 pswp__item elements, data is added later on. -->
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+        <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
+        <div class="pswp__ui pswp__ui--hidden">
+            <div class="pswp__top-bar">
+                <!--  Controls are self-explanatory. Order can be changed. -->
+                <div class="pswp__counter"></div>
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+                <!-- Preloader demo http://codepen.io/dimsemenov/pen/yyBWoR -->
+                <!-- element will get class pswp__preloader--active when preloader is running -->
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                      <div class="pswp__preloader__cut">
+                        <div class="pswp__preloader__donut"></div>
+                      </div>
+                    </div>
+                </div>
+            </div>
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div> 
+            </div>
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+</html>
