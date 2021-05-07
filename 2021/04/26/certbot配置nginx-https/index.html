@@ -1,0 +1,217 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN" class="loading">
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>certbot配置nginx https - wumi&#39;s blog</title>
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="google" content="notranslate" />
+    <meta name="keywords" content="wumi,"> 
+    <meta name="description" content="wumi&#39;s blog,还记得去年服务器备案申请域名折腾了两三天, 又是拍照又是上传身份证的, 记得当时回访的网警还问我网站内容做好上线了吗? 我答没有, 他便和我说那等我弄好了再申请下, 当时想着只是做技术上的尝试也没在,"> 
+    <meta name="author" content="5mi"> 
+    <link rel="alternative" href="atom.xml" title="wumi&#39;s blog" type="application/atom+xml"> 
+    <link rel="icon" href="/img/favicon.png"> 
+    
+    
+<link rel="stylesheet" href="/css/diaspora.css">
+
+    <link rel="stylesheet" href="//at.alicdn.com/t/font_2511899_nhreworgr7.css">
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+<body class="loading">
+    <span id="config-title" style="display:none">wumi&#39;s blog</span>
+    <div id="loader"></div>
+    <div id="single">
+    <div id="top" style="display: block;">
+    <div class="bar" style="width: 0;"></div>
+    <a class="iconfont icon-home image-icon" href="javascript:;" data-url="/"></a>
+    <div title="播放/暂停" class="iconfont icon-play"></div>
+    <h3 class="subtitle">certbot配置nginx https</h3>
+    <div class="social">
+        <div>
+            <div class="share">
+                <a title="获取二维码" class="iconfont icon-scan" href="javascript:;"></a>
+            </div>
+            <div id="qr"></div>
+        </div>
+    </div>
+    <div class="scrollbar"></div>
+</div>
+
+    <div class="section">
+        <div class="article">
+    <div class='main'>
+        <h1 class="title">certbot配置nginx https</h1>
+        <div class="stuff">
+            <span>四月 26, 2021</span>
+            
+                <!-- 不蒜子统计 -->
+                <span id="busuanzi_container_page_pv" style='display:none'>
+                      <i class="iconfont-for-blog icon-for-blogbook"></i> <span id="busuanzi_value_page_pv"></span>
+                </span>
+            
+            
+  <ul class="post-tags-list" itemprop="keywords"><li class="post-tags-list-item"><a class="post-tags-list-link" href="/tags/docker/" rel="tag">docker</a></li><li class="post-tags-list-item"><a class="post-tags-list-link" href="/tags/nginx/" rel="tag">nginx</a></li></ul>
+
+
+        </div>
+        <div class="content markdown">
+            <p>还记得去年服务器备案申请域名折腾了两三天, 又是拍照又是上传身份证的, 记得当时回访的网警还问我网站内容做好上线了吗? 我答没有, 他便和我说那等我弄好了再申请下, 当时想着只是做技术上的尝试也没在意, 这事放了好久, 前几天发现域名居然通过了,备案也成功了, 这就可以折腾起来了</p>
+<p>首先nginx配置我推荐用这个线上的<a target="_blank" rel="noopener" href="https://www.digitalocean.com/community/tools/nginx">NGINXConfig</a>,可以根据预设或自定义一步步的配置nginx,完成后可以直接拷贝或下载配置</p>
+<p><img src="nginx1.png" alt="nginx1"></p>
+<p>我这边是docker启动的nginx,所以一定要注意本地挂载目录和nginx配置中要对应一致,由于对生成配置目录的不熟悉导致我这里频繁改了好多次</p>
+<p>接下来就是通过certbot配置letsencrypt证书了, 这里要注意的是首次启动先将nginx设置为<code>http</code>即可,certbot生成证书时要先能访问此服务, 通过certbot的webroot来获取证书,certbot会根据<code>-w</code>参数的配置指定路径,之后在服务的这个路径下放置校验文件,后续会向服务的路径(<code>-w</code>设置的)发起请求来校验文件,服务可访问且校验通过后才能得到证书, 所以对应nginx添加配置,注意<code>/var/www/_letsencrypt</code>多处要配置一致</p>
+<figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># nginx</span></span><br><span class="line"><span class="comment"># ACME-challenge</span></span><br><span class="line"><span class="string">location</span> <span class="string">^~</span> <span class="string">/.well-known/acme-challenge/</span> &#123;</span><br><span class="line">    <span class="string">root</span> <span class="string">/var/www/_letsencrypt;</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>由于nginx和certbot服务都是docker 容器, 所以对应的校验路径要两容器都能读写访问,所以<strong>要注意把校验路径配置一致,挂载到本地同一目录</strong>, 此处我将<code>/var/www/_letsencrypt</code>统一挂载到<code>/home/nginx</code>,nginx的本地挂载目录下</p>
+<figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># certbot的docker-compose.yml</span></span><br><span class="line"><span class="attr">version:</span> <span class="string">&#x27;3&#x27;</span></span><br><span class="line"><span class="attr">services:</span>      </span><br><span class="line">  <span class="attr">docker_certbot:</span></span><br><span class="line">    <span class="attr">image:</span> <span class="string">certbot/certbot</span></span><br><span class="line">    <span class="attr">container_name:</span> <span class="string">certbot</span></span><br><span class="line">    <span class="attr">volumes:</span> </span><br><span class="line">      <span class="bullet">-</span> <span class="string">/etc/letsencrypt:/etc/letsencrypt</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">/var/lib/letsencrypt:/var/lib/letsencrypt</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">/home/nginx:/var/www/_letsencrypt</span></span><br><span class="line">    <span class="attr">command:</span> <span class="string">certonly</span> <span class="string">--webroot</span> <span class="string">-d</span> <span class="string">www.mimimimimi.top</span> <span class="string">--email</span> <span class="number">393223434</span><span class="string">@qq.com</span> <span class="string">-w</span> <span class="string">/var/www/_letsencrypt</span> <span class="string">-n</span> <span class="string">--agree-tos</span> <span class="string">--force-renewal</span></span><br></pre></td></tr></table></figure>
+
+<p>certbot得到证书后,nginx同样需要可读, 所以将两服务得证书目录统一挂载到本地同目录<code>/etc/letsencrypt</code>下,此时再将nginx配置成<code>https</code>,注意nginx配置中对应ssl部分要做相应修改,目录一致 例如:</p>
+<figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># SSL</span></span><br><span class="line"><span class="string">ssl_certificate</span>         <span class="string">/etc/letsencrypt/live/mimimimimi.top/fullchain.pem;</span></span><br><span class="line"><span class="string">ssl_certificate_key</span>     <span class="string">/etc/letsencrypt/live/mimimimimi.top/privkey.pem;</span></span><br><span class="line"><span class="string">ssl_trusted_certificate</span> <span class="string">/etc/letsencrypt/live/mimimimimi.top/chain.pem;</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># nginx 的 docker-compose.yml</span></span><br><span class="line"><span class="attr">version:</span> <span class="string">&#x27;3&#x27;</span>    <span class="comment"># 指定 docker-compose.yml 文件的写法格式</span></span><br><span class="line"><span class="attr">services:</span>       <span class="comment"># 多个容器集合</span></span><br><span class="line">  <span class="attr">docker_nginx:</span></span><br><span class="line">    <span class="attr">user:</span> <span class="string">root</span>  <span class="comment"># 为了避免一些权限问题 在这我使用了root</span></span><br><span class="line">    <span class="attr">restart:</span> <span class="string">always</span> <span class="comment"># 重启方式</span></span><br><span class="line">    <span class="attr">image:</span> <span class="string">nginx:alpine</span></span><br><span class="line">    <span class="attr">container_name:</span> <span class="string">nginx</span> <span class="comment"># 容器名称</span></span><br><span class="line">    <span class="attr">ports:</span>      <span class="comment"># 对外暴露的端口定义</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">&#x27;80:80&#x27;</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">&#x27;443:443&#x27;</span></span><br><span class="line">    <span class="attr">volumes:</span>    <span class="comment"># 卷挂载路径 防止挂载覆盖</span></span><br><span class="line">      <span class="comment"># /home/nginx:/etc/nginx 存在默认文件丢失</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">/home/nginx/nginxconfig.io:/etc/nginx/nginxconfig.io</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">/home/nginx/sites-enabled:/etc/nginx/sites-enabled</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">/home/nginx/sites-available:/etc/nginx/sites-available</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">/home/nginx/nginx.conf:/etc/nginx/nginx.conf</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">/home/nginx/public:/var/www/mimimimimi.top/public</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">/etc/letsencrypt:/etc/letsencrypt</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">/home/nginx:/var/www/_letsencrypt</span> <span class="comment"># 配合certbot, letsencrypt校验用</span></span><br></pre></td></tr></table></figure>
+<p>修改后别忘了重启nginx镜像</p>
+<p>由于免费证书90天失效,之后还可以在服务器中通过<code>crontab</code>设置定时任务重起certbot容器,来重新生成证书</p>
+<p><a target="_blank" rel="noopener" href="https://www.digitalocean.com/community/tools/nginx?domains.0.https.letsEncryptEmail=393223434@qq.com&domains.0.logging.accessLog=true&domains.0.logging.errorLog=true&domains.0.php.php=false&domains.0.reverseProxy.reverseProxy=true&domains.0.reverseProxy.path=/forProxy&domains.0.reverseProxy.proxyPass=http://127.0.0.1:9999&domains.0.routing.index=index.html&domains.0.routing.fallbackHtml=true&domains.0.routing.fallbackPhp=false&domains.0.server.domain=mimimimimi.top&domains.0.server.wwwSubdomain=true&global.docker.dockerCompose=true&global.nginx.user=nginx&global.nginx.pid=/var/run/nginx.pid">参考修改</a><br><a target="_blank" rel="noopener" href="https://certbot.eff.org/docs/install.html#running-with-docker">certbot running-with-docker</a><br><a target="_blank" rel="noopener" href="https://certbot.eff.org/docs/using.html#webroot">certbot webroot</a><br><a target="_blank" rel="noopener" href="https://segmentfault.com/a/1190000005797776">参考</a><br><a target="_blank" rel="noopener" href="https://www.cnblogs.com/gao88/p/10596143.html">定时更新参考</a><br><a target="_blank" rel="noopener" href="https://gitee.com/mimimimimi/docker_nginx_certbot">代码留存</a></p>
+
+            <!--[if lt IE 9]><script>document.createElement('audio');</script><![endif]-->
+            <audio id="audio" loop="1" preload="auto" controls="controls" data-autoplay="true">
+                <source type="audio/mpeg" src="">
+            </audio>
+            
+                <ul id="audio-list" style="display:none">
+                    
+                        
+                            <li title='0' data-url='/music/Saito - 愛撫 「Saito Ｘ ＡＰＯ」.mp3'></li>
+                        
+                    
+                        
+                            <li title='1' data-url='/music/坂本龍一 - Merry Christmas Mr.Lawrence.mp3'></li>
+                        
+                    
+                        
+                            <li title='2' data-url='/music/茶太 (ちゃた) - 晴れ→恋心 (晴朗→恋心) [mqms2].mp3'></li>
+                        
+                    
+                        
+                            <li title='3' data-url='/music/光宗信吉 - Lost in Love.mp3'></li>
+                        
+                    
+                        
+                            <li title='4' data-url='/music/光宗信吉 - 恋ってもどかしい.mp3'></li>
+                        
+                    
+                        
+                            <li title='5' data-url='/music/菅野祐悟 - 美春の告白.mp3'></li>
+                        
+                    
+                        
+                            <li title='6' data-url='/music/麻枝准 - 夏影.mp3'></li>
+                        
+                    
+                        
+                            <li title='7' data-url='/music/山冈晃 (AKIRA YAMAOKA) - Promise [mqms2].mp3'></li>
+                        
+                    
+                        
+                            <li title='8' data-url='/music/上松範康 - 運命-SADAME-.mp3'></li>
+                        
+                    
+                </ul>
+            
+        </div>
+        
+    <!-- <div id='gitalk-container' class="comment link"
+		data-enable='false'
+        data-ae='false'
+        data-ci=''
+        data-cs=''
+        data-r=''
+        data-o=''
+        data-a=''
+        data-d='false'
+    >查看评论</div> -->
+
+
+    </div>
+    
+</div>
+
+
+    </div>
+</div>
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"debug":false,"pluginModelPath":"assets/","model":{"jsonPath":"/live2dw/assets/koharu.model.json"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":"ture"},"react":{"opacity":0.9},"log":false,"pluginJsPath":"lib/","pluginRootPath":"live2dw/","tagMode":false});</script></body>
+
+
+<script src="//lib.baomitu.com/jquery/1.8.3/jquery.min.js"></script>
+<script src="/js/plugin.js"></script>
+<script src="/js/typed.js"></script>
+<script src="/js/diaspora.js"></script>
+<script src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML.js"></script>
+<script src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+<link rel="stylesheet" href="/photoswipe/photoswipe.css">
+<link rel="stylesheet" href="/photoswipe/default-skin/default-skin.css">
+
+
+<script src="/photoswipe/photoswipe.min.js"></script>
+<script src="/photoswipe/photoswipe-ui-default.min.js"></script>
+
+
+<!-- Root element of PhotoSwipe. Must have class pswp. -->
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+    <!-- Background of PhotoSwipe. 
+         It's a separate element as animating opacity is faster than rgba(). -->
+    <div class="pswp__bg"></div>
+    <!-- Slides wrapper with overflow:hidden. -->
+    <div class="pswp__scroll-wrap">
+        <!-- Container that holds slides. 
+            PhotoSwipe keeps only 3 of them in the DOM to save memory.
+            Don't modify these 3 pswp__item elements, data is added later on. -->
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+        <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
+        <div class="pswp__ui pswp__ui--hidden">
+            <div class="pswp__top-bar">
+                <!--  Controls are self-explanatory. Order can be changed. -->
+                <div class="pswp__counter"></div>
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+                <!-- Preloader demo http://codepen.io/dimsemenov/pen/yyBWoR -->
+                <!-- element will get class pswp__preloader--active when preloader is running -->
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                      <div class="pswp__preloader__cut">
+                        <div class="pswp__preloader__donut"></div>
+                      </div>
+                    </div>
+                </div>
+            </div>
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div> 
+            </div>
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+</html>
