@@ -29,12 +29,9 @@
       </tags>
   </entry>
   <entry>
-    <title>firsttime</title>
-    <url>/2016/08/17/firsttime/</url>
-    <content><![CDATA[<p>尝试下hexo搭博客,感觉还是github下用issue更快一点儿?嘛,用hexo倒是可以有好看的主题来用</p>
-<p>博客坚持写下去的可能性对我来说还未知= =</p>
-<p>有机会再体验下hexo吧</p>
-<p><a href="https://github.com/5Mi/wumi_blog">github下用issue没事儿会记点儿东西</a></p>
+    <title>hexo again</title>
+    <url>/2021/04/25/hexoagain/</url>
+    <content><![CDATA[<p>时隔多年再次更新下blog, 更新下主题, 想着记录点儿什么~</p>
 ]]></content>
       <categories>
         <category>hexo</category>
@@ -96,9 +93,12 @@
       </tags>
   </entry>
   <entry>
-    <title>hexo again</title>
-    <url>/2021/04/25/hexoagain/</url>
-    <content><![CDATA[<p>时隔多年再次更新下blog, 更新下主题, 想着记录点儿什么~</p>
+    <title>firsttime</title>
+    <url>/2016/08/17/firsttime/</url>
+    <content><![CDATA[<p>尝试下hexo搭博客,感觉还是github下用issue更快一点儿?嘛,用hexo倒是可以有好看的主题来用</p>
+<p>博客坚持写下去的可能性对我来说还未知= =</p>
+<p>有机会再体验下hexo吧</p>
+<p><a href="https://github.com/5Mi/wumi_blog">github下用issue没事儿会记点儿东西</a></p>
 ]]></content>
       <categories>
         <category>hexo</category>
@@ -148,6 +148,103 @@
       </categories>
       <tags>
         <tag>工作中</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>常见面试算法</title>
+    <url>/2021/08/26/%E5%B8%B8%E8%A7%81%E9%9D%A2%E8%AF%95%E7%AE%97%E6%B3%95/</url>
+    <content><![CDATA[<h2 id="简单算法"><a href="#简单算法" class="headerlink" title="简单算法"></a>简单算法</h2><h3 id="链表"><a href="#链表" class="headerlink" title="链表"></a>链表</h3><ul>
+<li><p><a href="https://leetcode-cn.com/problems/reverse-linked-list/">反转链表</a></p>
+<details>
+<summary>展开查看</summary>
+  <pre>
+  <code>
+   var reverseList = function(head) &#123;
+    if (!head) return null;
+    let pre = null, cur = head;
+    while (cur) &#123;
+        // 关键: 保存下一个节点的值
+        let next = cur.next;
+        cur.next = pre;
+        pre = cur;
+        cur = next;
+    &#125;
+    return pre;
+  &#125;;
+  </code>
+  </pre>
+</details></li>
+</ul>
+<ul>
+<li><p><a href="https://leetcode-cn.com/problems/palindrome-linked-list/">链表回文</a></p>
+</li>
+<li><p>合并两个升序链表</p>
+</li>
+<li><p><a href="https://leetcode-cn.com/problems/merge-k-sorted-lists/">合并k个升序链表</a></p>
+</li>
+<li><p><a href="https://leetcode-cn.com/problems/reverse-nodes-in-k-group/">K 个一组翻转链表</a></p>
+</li>
+<li><p><a href="https://leetcode-cn.com/problems/linked-list-cycle/">环形链表</a></p>
+</li>
+<li><p><a href="https://leetcode-cn.com/problems/sort-list/">链表排序</a></p>
+</li>
+<li><p><a href="https://leetcode-cn.com/problems/intersection-of-two-linked-lists/">链表相交</a></p>
+</li>
+<li><p>链表倒数第k项值 (双指针,慢指针等待k步)</p>
+</li>
+</ul>
+<h3 id="字符串"><a href="#字符串" class="headerlink" title="字符串"></a>字符串</h3><ul>
+<li><p><a href="https://leetcode-cn.com/problems/longest-palindromic-substring/">最长回文子串</a></p>
+</li>
+<li><p><a href="https://leetcode-cn.com/problems/longest-common-prefix/">最长公共前缀</a></p>
+</li>
+<li><p><a href="https://leetcode-cn.com/problems/longest-substring-without-repeating-characters/">最长无重复字符串</a></p>
+</li>
+</ul>
+<h3 id="数组"><a href="#数组" class="headerlink" title="数组"></a>数组</h3><ul>
+<li><p><a href="https://leetcode-cn.com/problems/longest-continuous-increasing-subsequence/">最长连续递增序列</a></p>
+</li>
+<li><p><a href="https://leetcode-cn.com/problems/remove-duplicates-from-sorted-array/">删除有序数组中的重复项</a></p>
+</li>
+<li><p><a href="https://leetcode-cn.com/problems/container-with-most-water/">盛最多水的容器</a></p>
+</li>
+<li><p><a href="https://leetcode-cn.com/problems/two-sum/submissions/">两数之和</a></p>
+</li>
+<li><p><a href="https://leetcode-cn.com/problems/two-sum-ii-input-array-is-sorted/">两数之和 II - 输入有序数组</a></p>
+</li>
+</ul>
+<h3 id="二叉树"><a href="#二叉树" class="headerlink" title="二叉树"></a>二叉树</h3><ul>
+<li><p>深度优先遍历 (前序,中序,后序)</p>
+</li>
+<li><p>广度优先遍历 (层序)</p>
+</li>
+<li><p><a href="https://leetcode-cn.com/problems/maximum-depth-of-binary-tree/">二叉树最大深度</a></p>
+</li>
+<li><p><a href="https://leetcode-cn.com/problems/minimum-depth-of-binary-tree/">二叉树的最小深度</a></p>
+</li>
+<li><p><a href="https://leetcode-cn.com/problems/convert-sorted-array-to-binary-search-tree/">将有序数组转换为二叉搜索树</a></p>
+</li>
+<li><p><a href="https://leetcode-cn.com/problems/validate-binary-search-tree/">验证二叉搜索树</a></p>
+</li>
+<li><p><a href="https://leetcode-cn.com/problems/ping-heng-er-cha-shu-lcof/">验证平衡二叉树</a></p>
+</li>
+<li><p><a href="https://leetcode-cn.com/problems/lowest-common-ancestor-of-a-binary-tree/">二叉树的最近公共祖先</a></p>
+</li>
+<li><p><a href="https://leetcode-cn.com/problems/search-in-a-binary-search-tree/">二叉搜索树中的搜索</a></p>
+</li>
+<li><p><a href="https://leetcode-cn.com/problems/binary-tree-zigzag-level-order-traversal/">二叉树的锯齿形层序遍历【二叉树】</a></p>
+</li>
+</ul>
+<p><a href="https://leetcode-cn.com/leetbook/read/top-interview-questions-easy/x26epd/">Leetcode 初级算法</a></p>
+<p><a href="http://47.98.159.95/leetcode-js/nav/">前端算法练习指南</a></p>
+<p><a href="https://juejin.cn/post/6947842412102287373">字节跳动最爱考的 64 道算法题</a></p>
+<p>未来再更…</p>
+]]></content>
+      <categories>
+        <category>技术相关</category>
+      </categories>
+      <tags>
+        <tag>面试</tag>
       </tags>
   </entry>
   <entry>
