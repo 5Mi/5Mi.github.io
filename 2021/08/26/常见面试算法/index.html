@@ -10,11 +10,9 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="google" content="notranslate" />
     <meta name="keywords" content="wumi,"> 
-    <meta name="description" content="wumi&#39;s blog,简单算法排序
-插入排序
-
-
-12345678910111213141516function insertSort(arr) &amp;#123;  let res = [arr.splice(0, 1)[0,"> 
+    <meta name="description" content="wumi&#39;s blog,leetcode find me here
+尽量每天 leetcode 一道算法题, 简单题我重拳出击, 中等题我边缘 OB
+你说困难题怎么办? 我唯唯诺诺直奔解题区 (只做了解就好,不能强求 哈哈,"> 
     <meta name="author" content="5mi"> 
     <link rel="alternative" href="atom.xml" title="wumi&#39;s blog" type="application/atom+xml"> 
     <link rel="icon" href="/img/favicon.png"> 
@@ -63,7 +61,10 @@
 
         </div>
         <div class="content markdown">
-            <h2 id="简单算法"><a href="#简单算法" class="headerlink" title="简单算法"></a>简单算法</h2><h3 id="排序"><a href="#排序" class="headerlink" title="排序"></a>排序</h3><ul>
+            <p><a target="_blank" rel="noopener" href="https://leetcode-cn.com/u/5mi/">leetcode find me here</a></p>
+<p>尽量每天 leetcode 一道算法题, 简单题我重拳出击, 中等题我边缘 OB</p>
+<p>你说困难题怎么办? 我唯唯诺诺直奔解题区 (只做了解就好,不能强求 哈哈)</p>
+<h2 id="简单算法"><a href="#简单算法" class="headerlink" title="简单算法"></a>简单算法</h2><h3 id="排序"><a href="#排序" class="headerlink" title="排序"></a>排序</h3><ul>
 <li>插入排序</li>
 </ul>
 <p><img src="insertsort.png" alt="插入排序"></p>
@@ -87,7 +88,19 @@
 <figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">selectSort</span>(<span class="params">arr</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">const</span> res = [];</span><br><span class="line">  <span class="keyword">while</span> (arr.length &gt; <span class="number">1</span>) &#123;</span><br><span class="line">    <span class="keyword">let</span> min = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">let</span> i = <span class="number">1</span>; i &lt; arr.length; i++) &#123;</span><br><span class="line">      <span class="keyword">if</span> (arr[min] &gt; arr[i]) min = i;</span><br><span class="line">    &#125;</span><br><span class="line">    res.push(arr.splice(min, <span class="number">1</span>)[<span class="number">0</span>]);</span><br><span class="line">  &#125;</span><br><span class="line">  res.push(arr[<span class="number">0</span>]);</span><br><span class="line">  <span class="keyword">return</span> res;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p>等等</p>
-<p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/wteam-xq/p/4752610.html">排序图解：js排序算法实现</a><br><a target="_blank" rel="noopener" href="http://www.ruanyifeng.com/blog/2011/04/quicksort_in_javascript.html">快速排序</a></p>
+<p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/wteam-xq/p/4752610.html">排序图解：js 排序算法实现</a><br><a target="_blank" rel="noopener" href="http://www.ruanyifeng.com/blog/2011/04/quicksort_in_javascript.html">快速排序</a></p>
+<h3 id="二分法"><a href="#二分法" class="headerlink" title="二分法"></a>二分法</h3><blockquote>
+<ul>
+<li>初始条件：low = 0, height = length-1, mid = parseInt((height - low) / 2) + low</li>
+<li>终止：low === height (即 while(low !== height){})</li>
+<li>向左查找：height = mid</li>
+<li>向右查找: low = mid + 1</li>
+</ul>
+</blockquote>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/binary-search/">704. 二分查找</a></li>
+<li><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/find-first-and-last-position-of-element-in-sorted-array/">34. 在排序数组中查找元素的第一个和最后一个位置</a></li>
+</ul>
 <h3 id="链表"><a href="#链表" class="headerlink" title="链表"></a>链表</h3><ul>
 <li><p><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/reverse-linked-list/">反转链表</a></p>
 <details>
@@ -148,9 +161,9 @@
 </ul>
 <h3 id="二叉树"><a href="#二叉树" class="headerlink" title="二叉树"></a>二叉树</h3><ul>
 <li><p>深度优先遍历 (前序,中序,后序)</p>
-</li>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// DFS</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">walk</span>(<span class="params">head</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">if</span> (!head) <span class="keyword">return</span>;</span><br><span class="line">  <span class="comment">// 前序 handle head</span></span><br><span class="line">  walk(head.left);</span><br><span class="line">  <span class="comment">// 中序 handle head</span></span><br><span class="line">  walk(head.right);</span><br><span class="line">  <span class="comment">// 后序 handle head</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
 <li><p>广度优先遍历 (层序)</p>
-</li>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// BFS</span></span><br><span class="line"><span class="keyword">const</span> list = [head];</span><br><span class="line"><span class="keyword">while</span> (list.length) &#123;</span><br><span class="line">  <span class="keyword">let</span> len = list.length;</span><br><span class="line">  <span class="keyword">while</span> (len) &#123;</span><br><span class="line">    <span class="keyword">let</span> cur = list.pop();</span><br><span class="line">    <span class="comment">// handle cur</span></span><br><span class="line">    <span class="keyword">if</span> (cur.left) list.push(cur.left);</span><br><span class="line">    <span class="keyword">if</span> (cur.right) list.push(cur.right);</span><br><span class="line">    len--;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
 <li><p><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/maximum-depth-of-binary-tree/">二叉树最大深度</a></p>
 </li>
 <li><p><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/minimum-depth-of-binary-tree/">二叉树的最小深度</a></p>
@@ -171,6 +184,7 @@
 <p><a target="_blank" rel="noopener" href="https://leetcode-cn.com/leetbook/read/top-interview-questions-easy/x26epd/">Leetcode 初级算法</a></p>
 <p><a target="_blank" rel="noopener" href="http://47.98.159.95/leetcode-js/nav/">前端算法练习指南</a></p>
 <p><a target="_blank" rel="noopener" href="https://juejin.cn/post/6947842412102287373">字节跳动最爱考的 64 道算法题</a></p>
+<p><a target="_blank" rel="noopener" href="https://www.yuque.com/cuggz/interview/uxemin">「2021」LeetCode 面试常考题目</a></p>
 <p>未来再更…</p>
 
             <!--[if lt IE 9]><script>document.createElement('audio');</script><![endif]-->
